@@ -41,7 +41,8 @@ def main():
     for url in book_urls:
         scraper = BookScraper("http://books.toscrape.com/")
         book_data = scraper.scrape_book(url)
-        save_to_csv(book_data)
+        print(book_data)
+        # save_to_csv(book_data)
 
 
 main()

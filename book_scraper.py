@@ -61,9 +61,9 @@ class BookScraper:
     def get_review_rating(self) -> str:
         """Extract the review rating"""
         try:
-            star_div = self.soup.find('div', class_='star-rating')
-            if star_div and star_div.get('class'):
-                return star_div.get('class')[1]
+            star_p = self.soup.find('p', class_='star-rating')
+            if star_p and star_p.get('class'):
+                return star_p.get('class')[1]
             return ''
         except (AttributeError, IndexError):
             return ''
