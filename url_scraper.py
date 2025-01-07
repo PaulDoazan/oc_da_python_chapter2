@@ -24,7 +24,8 @@ class UrlScraper:
         for product in product_pods:
             link = product.find("a")
             if link and link.get("href"):
-                absolute_url = urljoin(self.base_url, link["href"])
+                cleaned_href = link["href"].replace("../", "")
+                absolute_url = urljoin(self.base_url, f"catalogue/{cleaned_href}")
                 self.books_urls.append(absolute_url)
 
         return self.books_urls

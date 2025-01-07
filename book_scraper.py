@@ -1,7 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import csv
-import os
 from typing import Dict, Optional
 
 
@@ -83,15 +81,3 @@ class BookScraper:
         }
 
         return self.book_data
-
-    def save_to_csv(self, result_dir: str = 'result', filename: str = 'book_data.csv') -> None:
-        """Save the scraped book data to a CSV file"""
-        os.makedirs(result_dir, exist_ok=True)
-        filepath = os.path.join(result_dir, filename)
-
-        with open(filepath, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=self.book_data.keys())
-            writer.writeheader()
-            writer.writerow(self.book_data)
-
-        print(f"Data has been written to {filepath}")
