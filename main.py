@@ -35,10 +35,12 @@ book_data = {
     'Price Excluding Tax': getContentNextToTableHead('Price (excl. tax)'),
     'Number Available': getContentNextToTableHead('Availability'),
     'Product Description': soup.find('div', id='product_description').find_next('p').text,
-    'Category': getContentNextToTableHead('Product Type'),
+    'Category': soup.find('ul', class_='breadcrumb').find_all('li')[2].text,
     'Review Rating': getReviewRating(soup),
     'Image URL': soup.find('div', class_='item active').find('img')['src']
 }
+
+print(book_data['Category'])
 
 # Write to CSV
 # Create result directory if it doesn't exist
