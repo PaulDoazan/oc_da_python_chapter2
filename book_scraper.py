@@ -25,6 +25,36 @@ class BookScraper:
         except AttributeError:
             return ''
 
+    def get_product_description(self, parent_tag_type: str, child_tag_type: str, id_param: str):
+        try:
+            product_div = self.soup.find(parent_tag_type, id=id_param)
+            if product_div:
+                return product_div.find_next(child_tag_type)
+            else:
+                return ''
+        except AttributeError:
+            return ''
+
+    def get_product_category(self, parent_tag_type: str, child_tag_type: str, class_param: str):
+        try:
+            category_ul = self.soup.find(parent_tag_type, class_=class_param)
+            if category_ul:
+                return category_ul.find_all(child_tag_type)[2].text
+            else:
+                return ''
+        except AttributeError:
+            return ''
+
+    def get_image_url(self, parent_tag_type: str, child_tag_type: str, class_param: str):
+        try:
+            image_div = self.soup.find(parent_tag_type, class_=class_param)
+            if image_div:
+                return image_div.find(child_tag_type)['src']
+            else:
+                return ''
+        except AttributeError:
+            return ''
+
     def get_review_rating(self) -> str:
         """Extract the review rating"""
         try:
@@ -46,10 +76,10 @@ class BookScraper:
             'Price Including Tax': self.get_content_next_to_table_head('Price (incl. tax)'),
             'Price Excluding Tax': self.get_content_next_to_table_head('Price (excl. tax)'),
             'Number Available': self.get_content_next_to_table_head('Availability'),
-            'Product Description': self.soup.find('div', id='product_description').find_next('p').text,
-            'Category': self.soup.find('ul', class_='breadcrumb').find_all('li')[2].text,
+            'Product Description': self.get_product_description('div', 'p', 'product_description'),
+            'Category': self.get_product_category('ul', 'li', 'breadcrumb'),
             'Review Rating': self.get_review_rating(),
-            'Image URL': self.soup.find('div', class_='item active').find('img')['src']
+            'Image URL': self.get_image_url('div', 'img', 'item active')
         }
 
         return self.book_data
