@@ -1,10 +1,12 @@
+from urllib.parse import urljoin
+
 import requests
 from bs4 import BeautifulSoup
 from typing import Dict, Optional
 
 
 class BookScraper:
-    def __init__(self, base_url: str = "http://books.toscrape.com"):
+    def __init__(self, base_url: str):
         self.base_url = base_url
         self.soup: Optional[BeautifulSoup] = None
         self.book_data: Dict = {}
@@ -47,7 +49,10 @@ class BookScraper:
         try:
             image_div = self.soup.find(parent_tag_type, class_=class_param)
             if image_div:
-                return image_div.find(child_tag_type)['src']
+                href = image_div.find(child_tag_type)['src']
+                cleaned_href = href.replace("../", "")
+                absolute_url = urljoin(self.base_url, cleaned_href)
+                return absolute_url
             else:
                 return ''
         except AttributeError:
