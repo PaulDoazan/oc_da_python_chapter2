@@ -40,10 +40,11 @@ book_data = {
     'Image URL': soup.find('div', class_='item active').find('img')['src']
 }
 
-print(book_data['Price Including Tax'])
-
 # Write to CSV
+# Create result directory if it doesn't exist
 result_dir = 'result'
+os.makedirs(result_dir, exist_ok=True)
+
 filename = os.path.join(result_dir, 'book_data.csv')
 
 with open(filename, 'w', newline='', encoding='utf-8') as f:
