@@ -4,6 +4,8 @@ import requests
 from bs4 import BeautifulSoup
 from typing import List, Optional
 
+from utils.url_utils import create_absolute_url
+
 
 class UrlScraper:
     def __init__(self, books_url: str):
@@ -24,8 +26,6 @@ class UrlScraper:
         for product in product_pods:
             link = product.find("a")
             if link and link.get("href"):
-                cleaned_href = link["href"].replace("../", "")
-                absolute_url = urljoin(self.base_url, f"catalogue/{cleaned_href}")
-                self.books_urls.append(absolute_url)
+                self.books_urls.append(create_absolute_url(self.base_url, link["href"], "catalogue/"))
 
         return self.books_urls
