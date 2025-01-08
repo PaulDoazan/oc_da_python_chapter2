@@ -19,13 +19,27 @@ class UrlScraper:
         page = response.content
         self.soup = BeautifulSoup(page, "html.parser")
 
-    def scrape_urls(self, url: str) -> List:
-        self.fetch_page(url)
-        product_pods = self.soup.find_all("article", class_="product_pod")
+    def get_next_page_url(self, current_url: str) -> Optional[str]:
+        """Get the URL of the next page if it exists"""
+        next_button = self.soup.find("li", class_="next")
+        if next_button and next_button.find("a"):
+            next_url = next_button.find("a")["href"]
+            return urljoin(current_url, next_url)
+        return None
 
-        for product in product_pods:
-            link = product.find("a")
-            if link and link.get("href"):
-                self.books_urls.append(create_absolute_url(self.base_url, link["href"], "catalogue/"))
+    def scrape_urls(self, url: str) -> List:
+        current_url = url
+
+        while current_url:
+            self.fetch_page(current_url)
+
+            product_pods = self.soup.find_all("article", class_="product_pod")
+
+            for product in product_pods:
+                link = product.find("a")
+                if link and link.get("href"):
+                    self.books_urls.append(create_absolute_url(self.base_url, link["href"], "catalogue/"))
+
+            current_url = self.get_next_page_url(current_url)
 
         return self.books_urls

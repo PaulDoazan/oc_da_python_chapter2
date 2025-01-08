@@ -34,7 +34,7 @@ def main():
 
     url_scraper = UrlScraper("http://books.toscrape.com/")
     book_urls = url_scraper.scrape_urls(
-        "http://books.toscrape.com/catalogue/category/books/historical-fiction_4/index.html")
+        "http://books.toscrape.com/catalogue/category/books/mystery_3/index.html")
 
     # book_url = "http://books.toscrape.com/catalogue/sharp-objects_997/index.html"
 
