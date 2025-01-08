@@ -6,17 +6,22 @@ import os
 from category_url_scraper import CategoryUrlScraper
 
 
-def delete_csv(result_dir: str = 'result', filename: str = 'book_data.csv') -> None:
-    """Delete the CSV file if it exists"""
-    filepath = os.path.join(result_dir, filename)
-    if os.path.exists(filepath):
-        os.remove(filepath)
-        print(f"CSV file has been deleted: {filepath}")
+def delete_csv_files(result_dir: str = 'result') -> None:
+    """Delete all CSV files in the result directory"""
+    if os.path.exists(result_dir):
+        for filename in os.listdir(result_dir):
+            if filename.endswith('.csv'):
+                filepath = os.path.join(result_dir, filename)
+                os.remove(filepath)
+                print(f"CSV file has been deleted: {filepath}")
 
 
-def save_to_csv(book_data, result_dir: str = 'result', filename: str = 'book_data.csv') -> None:
-    """Save the scraped book data to a CSV file"""
+def save_to_csv(book_data, category: str, result_dir: str = 'result') -> None:
+    """Save the scraped book data to a category-specific CSV file"""
     os.makedirs(result_dir, exist_ok=True)
+
+    # Create a valid filename from the category name
+    filename = f"{category.lower().replace(' ', '_')}_books.csv"
     filepath = os.path.join(result_dir, filename)
 
     # Check if file exists to determine if we need to write headers
@@ -32,18 +37,21 @@ def save_to_csv(book_data, result_dir: str = 'result', filename: str = 'book_dat
 
 
 def main():
-    delete_csv()
+    # Delete existing CSV files
+    delete_csv_files()
 
     category_url_scraper = CategoryUrlScraper("http://books.toscrape.com/")
     category_urls = category_url_scraper.scrape_urls()
-    book_url_scraper = BookUrlScraper("http://books.toscrape.com/")
-    book_urls = book_url_scraper.scrape_urls(
-        "http://books.toscrape.com/catalogue/category/books/mystery_3/index.html")
 
-    for url in book_urls:
-        scraper = BookScraper("http://books.toscrape.com/")
-        book_data = scraper.scrape_book(url)
-        save_to_csv(book_data)
+    for category_url in category_urls:
+        category_name = category_url.split('/')[-2].split('_')[0]
+        book_url_scraper = BookUrlScraper("http://books.toscrape.com/")
+        book_urls = book_url_scraper.scrape_urls(category_url)
+
+        for url in book_urls:
+            scraper = BookScraper("http://books.toscrape.com/")
+            book_data = scraper.scrape_book(url)
+            save_to_csv(book_data, category_name)
 
 
 main()
