@@ -1,8 +1,8 @@
-from urllib.parse import urljoin
-
 import requests
 from bs4 import BeautifulSoup
 from typing import Dict, Optional
+
+from utils.url_utils import create_absolute_url
 
 
 class BookScraper:
@@ -29,7 +29,7 @@ class BookScraper:
         try:
             product_div = self.soup.find(parent_tag_type, id=id_param)
             if product_div:
-                return product_div.find_next(child_tag_type)
+                return product_div.find_next(child_tag_type).text
             else:
                 return ''
         except AttributeError:
@@ -39,7 +39,7 @@ class BookScraper:
         try:
             category_ul = self.soup.find(parent_tag_type, class_=class_param)
             if category_ul:
-                return category_ul.find_all(child_tag_type)[2].text
+                return category_ul.find_all(child_tag_type)[2].text.strip()
             else:
                 return ''
         except AttributeError:
@@ -50,9 +50,7 @@ class BookScraper:
             image_div = self.soup.find(parent_tag_type, class_=class_param)
             if image_div:
                 href = image_div.find(child_tag_type)['src']
-                cleaned_href = href.replace("../", "")
-                absolute_url = urljoin(self.base_url, cleaned_href)
-                return absolute_url
+                return create_absolute_url(self.base_url, href)
             else:
                 return ''
         except AttributeError:
