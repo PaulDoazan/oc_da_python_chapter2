@@ -1,7 +1,9 @@
 from book_scraper import BookScraper
-from url_scraper import UrlScraper
+from book_url_scraper import BookUrlScraper
 import csv
 import os
+
+from category_url_scraper import CategoryUrlScraper
 
 
 def delete_csv(result_dir: str = 'result', filename: str = 'book_data.csv') -> None:
@@ -32,11 +34,11 @@ def save_to_csv(book_data, result_dir: str = 'result', filename: str = 'book_dat
 def main():
     delete_csv()
 
-    url_scraper = UrlScraper("http://books.toscrape.com/")
-    book_urls = url_scraper.scrape_urls(
+    category_url_scraper = CategoryUrlScraper("http://books.toscrape.com/")
+    category_urls = category_url_scraper.scrape_urls()
+    book_url_scraper = BookUrlScraper("http://books.toscrape.com/")
+    book_urls = book_url_scraper.scrape_urls(
         "http://books.toscrape.com/catalogue/category/books/mystery_3/index.html")
-
-    # book_url = "http://books.toscrape.com/catalogue/sharp-objects_997/index.html"
 
     for url in book_urls:
         scraper = BookScraper("http://books.toscrape.com/")

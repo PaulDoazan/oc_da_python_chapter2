@@ -4,14 +4,15 @@ import requests
 from bs4 import BeautifulSoup
 from typing import List, Optional
 
+from utils.fetch_utils import fetch_page
 from utils.url_utils import create_absolute_url
 
 
-class UrlScraper:
-    def __init__(self, books_url: str):
+class BookUrlScraper:
+    def __init__(self, base_url: str):
         self.books_urls: List = []
         self.soup: Optional[BeautifulSoup] = None
-        self.base_url = books_url
+        self.base_url: str = base_url
 
     def fetch_page(self, url: str) -> None:
         """Fetch the page content and create BeautifulSoup object"""
@@ -31,7 +32,7 @@ class UrlScraper:
         current_url = url
 
         while current_url:
-            self.fetch_page(current_url)
+            self.soup = BeautifulSoup(fetch_page(current_url), "html.parser")
 
             product_pods = self.soup.find_all("article", class_="product_pod")
 

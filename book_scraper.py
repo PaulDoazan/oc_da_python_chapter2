@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from typing import Dict, Optional
 
+from utils.fetch_utils import fetch_page
 from utils.url_utils import create_absolute_url
 
 
@@ -10,12 +11,6 @@ class BookScraper:
         self.base_url = base_url
         self.soup: Optional[BeautifulSoup] = None
         self.book_data: Dict = {}
-
-    def fetch_page(self, url: str) -> None:
-        """Fetch the page content and create BeautifulSoup object"""
-        response = requests.get(url)
-        page = response.content
-        self.soup = BeautifulSoup(page, "html.parser")
 
     def get_content_next_to_table_head(self, th_parameter: str) -> str:
         """Extract content next to a table header"""
@@ -68,7 +63,7 @@ class BookScraper:
 
     def scrape_book(self, url: str) -> Dict:
         """Scrape all book data from a given URL"""
-        self.fetch_page(url)
+        self.soup = BeautifulSoup(fetch_page(url), "html.parser")
 
         self.book_data = {
             'Title': self.soup.find("h1").text,
