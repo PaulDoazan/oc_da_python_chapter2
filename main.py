@@ -5,6 +5,7 @@ import csv
 import os
 import shutil
 from category_url_scraper import CategoryUrlScraper
+import time
 
 
 def delete_results_directories(result_dir: str = 'result') -> None:
@@ -16,7 +17,7 @@ def delete_results_directories(result_dir: str = 'result') -> None:
         except Exception as e:
             print(f"Error deleting results directory: {str(e)}")
 
-    os.makedirs(result_dir)
+    os.makedirs(result_dir, exist_ok=True)
     print(f"Created empty results directory: {result_dir}")
 
 
@@ -39,6 +40,9 @@ def save_to_csv(book_data: dict, category: str, result_dir: str = 'result') -> N
 
 
 def main():
+    # It will be used to calculate time needed for all requests
+    start_time = time.time()
+
     base_url = "http://books.toscrape.com/"
 
     # Initialize image loader
@@ -64,6 +68,9 @@ def main():
 
             # Save book data to CSV
             save_to_csv(book_data, category_name)
+
+    end_time = time.time()
+    print(f"\nTotal execution time: {end_time - start_time:.2f} seconds")
 
 
 if __name__ == "__main__":

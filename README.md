@@ -31,3 +31,10 @@ python main.py
 ```
 
 Once completed, you will find the CSV file in the `result` directory.
+
+As a suggestion made by my mentor, the scraping is implemented on a multithread requests process. It aims at reducing
+the total time of process by executing several requests at same time, though results are exactly the same.
+Monitoring time gives the following results :
+
+- main.py : 1067.98 seconds
+- multithread.py : 123.89 seconds

@@ -8,6 +8,7 @@ import shutil
 import concurrent.futures
 from typing import List, Dict
 import threading
+import time
 
 
 class ThreadSafeWriter:
@@ -40,7 +41,7 @@ def delete_results_directories(result_dir: str = 'result') -> None:
             print(f"Results directory has been deleted")
         except Exception as e:
             print(f"Error deleting results directory: {str(e)}")
-    os.makedirs(result_dir)
+    os.makedirs(result_dir, exist_ok=True)
     print(f"Created empty results directory: {result_dir}")
 
 
@@ -69,6 +70,9 @@ def process_category(args: tuple) -> List[str]:
 
 
 def main():
+    # It will be used to calculate time needed for all requests
+    start_time = time.time()
+
     base_url = "http://books.toscrape.com/"
     max_workers = 20  # Adjust this based on your system capabilities and website limitations
 
@@ -102,6 +106,9 @@ def main():
             if book_data:
                 category_name = book_data.get('category', 'unknown')
                 csv_writer.save_to_csv(book_data, category_name)
+
+    end_time = time.time()
+    print(f"\nTotal execution time: {end_time - start_time:.2f} seconds")
 
 
 if __name__ == "__main__":

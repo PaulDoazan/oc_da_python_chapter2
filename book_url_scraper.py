@@ -14,12 +14,6 @@ class BookUrlScraper:
         self.soup: Optional[BeautifulSoup] = None
         self.base_url: str = base_url
 
-    def fetch_page(self, url: str) -> None:
-        """Fetch the page content and create BeautifulSoup object"""
-        response = requests.get(url)
-        page = response.content
-        self.soup = BeautifulSoup(page, "html.parser")
-
     def get_next_page_url(self, current_url: str) -> Optional[str]:
         """Get the URL of the next page if it exists"""
         next_button = self.soup.find("li", class_="next")
