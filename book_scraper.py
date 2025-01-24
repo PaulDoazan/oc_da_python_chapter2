@@ -11,11 +11,16 @@ class BookScraper:
         self.soup: Optional[BeautifulSoup] = None
         self.book_data: Dict = {}
 
-    def get_content_next_to_table_head(self, th_parameter: str) -> str:
+    def get_content_next_to_table_head(self, th_parameter: str, numbers_only: bool = False) -> str:
         """Extract content next to a table header"""
         try:
             name_header = self.soup.find('th', string=th_parameter)
-            return name_header.find_next_sibling('td').text if name_header else ''
+            content = name_header.find_next_sibling('td').text if name_header else ''
+            if numbers_only:
+                only_digits = ''.join(char for char in content if char.isdigit() or char in '.,')
+                print(only_digits)
+                return only_digits
+            return content
         except AttributeError:
             return ''
 
@@ -68,9 +73,9 @@ class BookScraper:
             'Title': self.soup.find("h1").text,
             'Product Page URL': url,
             'Universal Product Code': self.get_content_next_to_table_head('UPC'),
-            'Price Including Tax': self.get_content_next_to_table_head('Price (incl. tax)'),
-            'Price Excluding Tax': self.get_content_next_to_table_head('Price (excl. tax)'),
-            'Number Available': self.get_content_next_to_table_head('Availability'),
+            'Price Including Tax': self.get_content_next_to_table_head('Price (incl. tax)', True),
+            'Price Excluding Tax': self.get_content_next_to_table_head('Price (excl. tax)', True),
+            'Number Available': self.get_content_next_to_table_head('Availability', True),
             'Product Description': self.get_product_description('div', 'p', 'product_description'),
             'Category': self.get_product_category('ul', 'li', 'breadcrumb'),
             'Review Rating': self.get_review_rating(),

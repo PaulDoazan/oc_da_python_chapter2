@@ -3,19 +3,30 @@ from book_url_scraper import BookUrlScraper
 from image_handler import ImageHandler
 import csv
 import os
-import shutil
 from category_url_scraper import CategoryUrlScraper
 import time
 
 
 def delete_results_directories(result_dir: str = 'result') -> None:
-    """Delete the entire result directory and its contents"""
+    """Delete all files and subdirectories in result directory one by one"""
     if os.path.exists(result_dir):
+        for root, dirs, files in os.walk(result_dir, topdown=False):
+            for name in files:
+                file_path = os.path.join(root, name)
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {str(e)}")
+            for name in dirs:
+                dir_path = os.path.join(root, name)
+                try:
+                    os.rmdir(dir_path)
+                except Exception as e:
+                    print(f"Error deleting directory {dir_path}: {str(e)}")
         try:
-            shutil.rmtree(result_dir)
-            print(f"Results directory has been deleted")
+            os.rmdir(result_dir)
         except Exception as e:
-            print(f"Error deleting results directory: {str(e)}")
+            print(f"Error deleting root directory: {str(e)}")
 
     os.makedirs(result_dir, exist_ok=True)
     print(f"Created empty results directory: {result_dir}")
