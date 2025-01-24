@@ -1,6 +1,7 @@
 import os
 import requests
 from urllib.parse import urljoin
+import re
 
 
 class ImageHandler:
@@ -35,6 +36,18 @@ class ImageHandler:
         except Exception as e:
             print(f"Error downloading image from {image_url}: {str(e)}")
 
+    def sanitize_filename(self, filename: str) -> str:
+        # Split into name and extension
+        name, ext = os.path.splitext(filename)
+        # Remove all punctuation and special characters from name
+        clean_name = re.sub(r'[^\w\s-]', '', name)
+        # Replace multiple spaces/hyphens with single ones
+        clean_name = re.sub(r'[-\s]+', '_', clean_name)
+        # If name ends with hyphen or underscore, append 'x'
+        if clean_name[-1] in '-_':
+            clean_name += 'x'
+        return clean_name + ext
+
     def process_book_image(self, book_data: dict, category: str) -> dict:
         """
         Process and download the book image, update book_data with local image path
@@ -54,6 +67,7 @@ class ImageHandler:
         # Create a valid filename for the image
         title = book_data.get('Title', 'unknown')
         image_filename = f"{title.lower().replace(' ', '_')[:50]}.jpg"
+        image_filename = self.sanitize_filename(image_filename)
         image_path = os.path.join(images_dir, image_filename)
 
         print(f"Saving image to: {image_path}")
@@ -65,16 +79,3 @@ class ImageHandler:
         book_data['local_image_path'] = os.path.join('images', image_filename)
 
         return book_data
-
-    def cleanup_images(self) -> None:
-        """Clean up all image directories"""
-        if os.path.exists(self.result_dir):
-            for category_dir in os.listdir(self.result_dir):
-                category_path = os.path.join(self.result_dir, category_dir)
-                if os.path.isdir(category_path):
-                    images_dir = os.path.join(category_path, 'images')
-                    if os.path.exists(images_dir):
-                        for image in os.listdir(images_dir):
-                            os.remove(os.path.join(images_dir, image))
-                        os.rmdir(images_dir)
-                        print(f"Images directory has been deleted: {images_dir}")
