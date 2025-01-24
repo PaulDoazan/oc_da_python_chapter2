@@ -70,39 +70,42 @@ def process_category(args: tuple) -> List[str]:
 
 
 def main():
-    # It will be used to calculate time needed for all requests
     start_time = time.time()
-
     base_url = "http://books.toscrape.com/"
-    max_workers = 20  # Adjust this based on your system capabilities and website limitations
+    max_workers = 20
 
-    # Initialize shared resources
     image_loader = ImageHandler(base_url)
     csv_writer = ThreadSafeWriter()
-
-    # Delete existing results directory
     delete_results_directories()
 
-    # Get category URLs
     category_url_scraper = CategoryUrlScraper(base_url)
     category_urls = category_url_scraper.scrape_urls()
 
-    # Process categories in parallel
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        # Create arguments for each category
-        category_args = [(url, base_url) for url in category_urls]
+        category_args = []
+        for url in category_urls:
+            category_args.append((url, base_url))
 
-        # Process categories and collect all book URLs
+        # Runs process_category() on each tuple in parallel, returns list of results: [books_from_url1, books_from_url2]
         category_results = list(executor.map(process_category, category_args))
 
-        # Flatten the list of book URLs and pair with their categories
         book_tasks = []
-        for category_url, book_urls in zip(category_urls, category_results):
+        for i in range(len(category_urls)):
+            category_url = category_urls[i]
+            book_urls = category_results[i]
             category_name = category_url.split('/')[-2].split('_')[0]
-            book_tasks.extend([(url, base_url, category_name, image_loader) for url in book_urls])
 
-        # Process books in parallel
-        for book_data in executor.map(process_book, book_tasks):
+            for url in book_urls:
+                book_tasks.append((url, base_url, category_name, image_loader))
+
+        # executor.map() starts parallel processing tasks:
+        # - Takes each item from book_tasks list (containing tuples of URL, base_url, category, image_loader)
+        # - Passes each tuple to process_book() function
+        # - Thread pool executes these operations concurrently (multiple books processed simultaneously)
+        # - Returns iterator of results that yields each book's data as processing completes
+        # - Results maintain same order as input book_tasks list
+        results = executor.map(process_book, book_tasks)
+        for book_data in results:
             if book_data:
                 category_name = book_data.get('category', 'unknown')
                 csv_writer.save_to_csv(book_data, category_name)
