@@ -24,7 +24,12 @@ env\Scripts\activate
 source env/bin/activate
 ```
 
-### 3. Execute the Script
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Execute the Script
 
 ```bash
 python main.py
